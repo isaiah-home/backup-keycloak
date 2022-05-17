@@ -27,20 +27,30 @@ if [ -z ${AWS_DEFAULT_REGION+x} ]; then
     exit 1;
 fi
 
+docker stop nextcloud
 
-export BACKUP_NAME=keycloak
-export BACKUP_BAK=$BACKUP_NAME.bak
-export BACKUP_ZIP=$BACKUP_NAME.zip
+export DATABASE_NAME=nextcloud
+export BACKUP_ZIP=$DATABASE_NAME.zip
 
 # Dump database to file
-(mysqldump --host=$MYSQL_HOST --port=$MYSQL_PORT --user=$MYSQL_USERNAME --password=$MYSQL_PASSWORD keycloak || exit 1) > $BACKUP_BAK
+(mysqldump --host=$MYSQL_HOST --port=$MYSQL_PORT --user=$MYSQL_USERNAME --password=$MYSQL_PASSWORD $DATABASE_NAME || exit 1) > database.bak
+
+# Copy data files from container
+mkdir files
+docker cp nextcloud:/var/www/html/config/ files/config/ || exit 1
+docker cp nextcloud:/var/www/html/data/ files/data/ || exit 1
+docker cp nextcloud:/var/www/html/themes/ files/themes/ || exit 1
 
 # Zip file
-zip $BACKUP_ZIP $BACKUP_BAK || exit 1
+zip -r $BACKUP_ZIP database.bak files || exit 1
 
 # Save zip to s3
-aws s3 cp $BACKUP_ZIP s3://backups.ivcode.org/keycloak/$BACKUP_ZIP || exit 1
+aws s3 cp $BACKUP_ZIP s3://backups.ivcode.org/$DATABASE_NAME/$BACKUP_ZIP || exit 1
 
 # Cleanup
-rm $BACKUP_BAK
+rm database.bak
 rm $BACKUP_ZIP
+rm -rf files
+
+docker start nextcloud
+
