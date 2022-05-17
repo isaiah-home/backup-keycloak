@@ -27,20 +27,15 @@ if [ -z ${AWS_DEFAULT_REGION+x} ]; then
     exit 1;
 fi
 
+# Pull restore file
+aws s3 cp s3://backups.ivcode.org/wikijs.zip wikijs.zip || exit 1
 
-export BACKUP_NAME=keycloak
-export BACKUP_BAK=$BACKUP_NAME.bak
-export BACKUP_ZIP=$BACKUP_NAME.zip
+# Unzip restore file
+unzip wikijs.zip || exit 1
 
-# Dump database to file
-(mysqldump --host=$MYSQL_HOST --port=$MYSQL_PORT --user=$MYSQL_USERNAME --password=$MYSQL_PASSWORD keycloak || exit 1) > $BACKUP_BAK
+# Restore database
+mysql --host=$MYSQL_HOST --port=$MYSQL_PORT --user=$MYSQL_USERNAME --password=$MYSQL_PASSWORD --database=wikijs < database.bak
 
-# Zip file
-zip $BACKUP_ZIP $BACKUP_BAK || exit 1
-
-# Save zip to s3
-aws s3 cp $BACKUP_ZIP s3://backups.ivcode.org/keycloak/$BACKUP_ZIP || exit 1
-
-# Cleanup
-rm $BACKUP_BAK
-rm $BACKUP_ZIP
+#Cleanup
+rm database.bak
+rm wikijs.zip

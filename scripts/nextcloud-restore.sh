@@ -31,7 +31,7 @@ fi
 docker exec --user www-data nextcloud php occ maintenance:mode --on
 
 # Pull restore file
-aws s3 cp s3://backups.ivcode.org/nextcloud/nextcloud.zip nextcloud.zip || exit 1
+aws s3 cp s3://backups.ivcode.org/nextcloud.zip nextcloud.zip || exit 1
 
 # Unzip restore file
 unzip nextcloud.zip || exit 1
