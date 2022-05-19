@@ -7,7 +7,7 @@ Cron jobs are setup for nightly backups.
 
 Edit the crontab file
 ```
-crontab –e
+crontab -e
 ```
 
 Add the following jobs
