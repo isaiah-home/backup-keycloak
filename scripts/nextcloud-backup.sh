@@ -10,47 +10,37 @@ if [ -z ${MYSQL_USERNAME+x} ]; then
     export MYSQL_USERNAME=root;
 fi
 if [ -z ${MYSQL_PASSWORD+x} ]; then
-    export MYSQL_PASSWORD=$(aws ssm get-parameter --with-decryption --name isaiah-home.mysql_password | jq -r ".Parameter.Value");
+    export MYSQL_PASSWORD=$(aws ssm get-parameter --with-decryption --name organize-me.mysql_password | jq -r ".Parameter.Value");
+    if [ -z "$MYSQL_PASSWORD" ]; then exit 1; fi
 fi
 
 
-if [ -z ${AWS_ACCESS_KEY_ID+x} ]; then
-    echo "AWS_ACCESS_KEY_ID not set";
-    exit 1;
-fi
-if [ -z ${AWS_SECRET_ACCESS_KEY+x} ]; then
-    echo "AWS_SECRET_ACCESS_KEY not set";
-    exit 1;
-fi
-if [ -z ${AWS_DEFAULT_REGION+x} ]; then
-    echo "AWS_DEFAULT_REGION not set";
-    exit 1;
-fi
-
-docker stop nextcloud
+# Maintenace Mode On
+docker exec --user www-data organize-me-nextcloud php occ maintenance:mode --on || exit 1
 
 export DATABASE_NAME=nextcloud
 export BACKUP_ZIP=$DATABASE_NAME.zip
 
 # Dump database to file
-(mysqldump --host=$MYSQL_HOST --port=$MYSQL_PORT --user=$MYSQL_USERNAME --password=$MYSQL_PASSWORD $DATABASE_NAME || exit 1) > database.bak
+mysqldump --host=$MYSQL_HOST --port=$MYSQL_PORT --user=$MYSQL_USERNAME --password=$MYSQL_PASSWORD $DATABASE_NAME > database.bak
+if [ $? -ne 0 ]; then exit 1; fi
 
 # Copy data files from container
 mkdir files
-docker cp nextcloud:/var/www/html/config/ files/config/ || exit 1
-docker cp nextcloud:/var/www/html/data/ files/data/ || exit 1
-docker cp nextcloud:/var/www/html/themes/ files/themes/ || exit 1
+docker cp organize-me-nextcloud:/var/www/html/config/ files/config/ || exit 1
+docker cp organize-me-nextcloud:/var/www/html/data/ files/data/ || exit 1
+docker cp organize-me-nextcloud:/var/www/html/themes/ files/themes/ || exit 1
 
 # Zip file
 zip -r $BACKUP_ZIP database.bak files || exit 1
 
 # Save zip to s3
-aws s3 cp $BACKUP_ZIP s3://backups.ivcode.org/$BACKUP_ZIP || exit 1
+aws s3 cp $BACKUP_ZIP s3://backups.$DOMAIN/$BACKUP_ZIP || exit 1
 
 # Cleanup
 rm database.bak
 rm $BACKUP_ZIP
 rm -rf files
 
-docker start nextcloud
-
+# Maintenace Mode On
+docker exec --user www-data organize-me-nextcloud php occ maintenance:mode --off

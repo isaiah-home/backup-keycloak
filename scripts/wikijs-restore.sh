@@ -10,32 +10,23 @@ if [ -z ${MYSQL_USERNAME+x} ]; then
     export MYSQL_USERNAME=root;
 fi
 if [ -z ${MYSQL_PASSWORD+x} ]; then
-    export MYSQL_PASSWORD=$(aws ssm get-parameter --with-decryption --name isaiah-home.mysql_password | jq -r ".Parameter.Value");
+    export MYSQL_PASSWORD=$(aws ssm get-parameter --with-decryption --name organize-me.mysql_password | jq -r ".Parameter.Value");
+    if [ -z "$MYSQL_PASSWORD" ]; then exit 1; fi
 fi
 
-
-if [ -z ${AWS_ACCESS_KEY_ID+x} ]; then
-    echo "AWS_ACCESS_KEY_ID not set";
-    exit 1;
-fi
-if [ -z ${AWS_SECRET_ACCESS_KEY+x} ]; then
-    echo "AWS_SECRET_ACCESS_KEY not set";
-    exit 1;
-fi
-if [ -z ${AWS_DEFAULT_REGION+x} ]; then
-    echo "AWS_DEFAULT_REGION not set";
-    exit 1;
-fi
 
 # Pull restore file
-aws s3 cp s3://backups.ivcode.org/wikijs.zip wikijs.zip || exit 1
+aws s3 cp s3://backups.$DOMAIN/wikijs.zip wikijs.zip || exit 1
 
 # Unzip restore file
 unzip wikijs.zip || exit 1
 
 # Restore database
 mysql --host=$MYSQL_HOST --port=$MYSQL_PORT --user=$MYSQL_USERNAME --password=$MYSQL_PASSWORD --database=wikijs < database.bak
+if [ $? -ne 0 ]; then exit 1; fi
 
 #Cleanup
 rm database.bak
 rm wikijs.zip
+
+docker restart organize-me-wikijs
