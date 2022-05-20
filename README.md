@@ -18,6 +18,7 @@ Add the following jobs
 00 2 * * * . bin/env.sh; bin/keycloak-backup.sh >> logs/keycloak.log 2>&1
 10 2 * * * . bin/env.sh; bin/wikijs-backup.sh >> logs/wikijs.log 2>&1
 20 2 * * * . bin/env.sh; bin/nextcloud-backup.sh >> logs/nextcloud.log 2>&1
+30 2 * * * . bin/env.sh; bin/snipeit-backup.sh >> logs/snipeit.log 2>&1
 ```
 
 # Restores
