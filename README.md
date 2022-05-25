@@ -4,6 +4,7 @@ This defines the backup/restore processes.
 # Notes
  * Backups are saved off-site in an AWS S3 bucket
  * It's assumed all scripts are in the user's bin folder: ```~/bin/```
+ * Backup and restores depend on the ```env.sh``` script setup in the ```init``` repo
 
 # Cron Setup
 Cron jobs are setup for nightly backups.
