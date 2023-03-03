@@ -9,3 +9,5 @@ cp scripts/wikijs-backup.sh ~/bin/wikijs-backup.sh
 cp scripts/wikijs-restore.sh ~/bin/wikijs-restore.sh
 cp scripts/snipeit-backup.sh ~/bin/snipeit-backup.sh
 cp scripts/snipeit-restore.sh ~/bin/snipeit-restore.sh
+cp scripts/vaultwarden-backup.sh ~/bin/vaultwarden-backup.sh
+cp scripts/vaultwarden-restore.sh ~/bin/vaultwarden-restore.sh
