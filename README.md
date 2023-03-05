@@ -20,7 +20,7 @@ Add the following jobs
 10 2 * * * . bin/env.sh; bin/wikijs-backup.sh >> logs/wikijs.log 2>&1
 20 2 * * * . bin/env.sh; bin/nextcloud-backup.sh >> logs/nextcloud.log 2>&1
 30 2 * * * . bin/env.sh; bin/snipeit-backup.sh >> logs/snipeit.log 2>&1
-40 2 * * * . bin/env.sh; bin/vaultwarden-backup.sh >> logs/vaultwarden.log 2>$1
+40 2 * * * . bin/env.sh; bin/vaultwarden-backup.sh >> logs/vaultwarden.log 2>&1
 ```
 
 # Restores
