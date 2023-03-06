@@ -31,7 +31,7 @@ docker cp organize-me-vaultwarden:/data/ ./ || exit 1
 zip -r $BACKUP_ZIP database.bak data || exit 1
 
 # Save zip to s3
-aws s3 cp $BACKUP_ZIP s3://backups.$DOMAIN/$BACKUP_ZIP || exit 1
+aws s3 cp $BACKUP_ZIP s3://organize-me.$DOMAIN.backups/$BACKUP_ZIP || exit 1
 
 # Cleanup
 rm database.bak

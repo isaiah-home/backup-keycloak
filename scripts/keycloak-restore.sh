@@ -17,7 +17,7 @@ fi
 docker stop organize-me-keycloak || exit 1
 
 # Pull restore file
-aws s3 cp s3://backups.$DOMAIN/keycloak.zip keycloak.zip || exit 1
+aws s3 cp s3://organize-me.$DOMAIN.backups/keycloak.zip keycloak.zip || exit 1
 
 # Unzip restore file
 unzip keycloak.zip || exit 1

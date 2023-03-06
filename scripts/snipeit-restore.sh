@@ -1,6 +1,6 @@
 #!/bin/sh
 
-aws s3 cp s3://backups.$DOMAIN/snipeit.zip ./snipeit.zip
+aws s3 cp s3://organize-me.$DOMAIN.backups/snipeit.zip ./snipeit.zip
 
 docker cp ./snipeit.zip organize-me-snipeit:/var/www/html/storage/app/backups/snipeit.zip || exit 1
 

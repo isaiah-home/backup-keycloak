@@ -15,8 +15,10 @@ if [ -z ${MYSQL_PASSWORD+x} ]; then
 fi
 
 
+docker stop organize-me-wikijs || exit 1
+
 # Pull restore file
-aws s3 cp s3://backups.$DOMAIN/wikijs.zip wikijs.zip || exit 1
+aws s3 cp s3://organize-me.$DOMAIN.backups/wikijs.zip wikijs.zip || exit 1
 
 # Unzip restore file
 unzip wikijs.zip || exit 1

@@ -19,7 +19,7 @@ fi
 docker exec --user www-data organize-me-nextcloud php occ maintenance:mode --on || exit 1
 
 export DATABASE_NAME=nextcloud
-export BACKUP_ZIP=$DATABASE_NAME.zip
+export BACKUP_ZIP=$DATABASE_NAME.v25.zip
 
 # Dump database to file
 mysqldump --host=$MYSQL_HOST --port=$MYSQL_PORT --user=$MYSQL_USERNAME --password=$MYSQL_PASSWORD $DATABASE_NAME > database.bak
@@ -35,7 +35,7 @@ docker cp organize-me-nextcloud:/var/www/html/themes/ files/themes/ || exit 1
 zip -r $BACKUP_ZIP database.bak files || exit 1
 
 # Save zip to s3
-aws s3 cp $BACKUP_ZIP s3://backups.$DOMAIN/$BACKUP_ZIP || exit 1
+aws s3 cp $BACKUP_ZIP s3://organize-me.$DOMAIN.backups/$BACKUP_ZIP || exit 1
 
 # Cleanup
 rm database.bak

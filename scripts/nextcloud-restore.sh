@@ -14,18 +14,20 @@ if [ -z ${MYSQL_PASSWORD+x} ]; then
     if [ -z "$MYSQL_PASSWORD" ]; then exit 1; fi
 fi
 
-
 # Maintenace Mode On
 docker exec --user www-data organize-me-nextcloud php occ maintenance:mode --on || exit 1
 
+export DATABASE_NAME=nextcloud
+export BACKUP_ZIP=$DATABASE_NAME.v25.zip
+
 # Pull restore file
-aws s3 cp s3://backups.$DOMAIN/nextcloud.zip nextcloud.zip || exit 1
+aws s3 cp s3://organize-me.$DOMAIN.backups/$BACKUP_ZIP $BACKUP_ZIP || exit 1
 
 # Unzip restore file
-unzip nextcloud.zip || exit 1
+unzip $BACKUP_ZIP || exit 1
 
 # Restore database
-mysql --host=$MYSQL_HOST --port=$MYSQL_PORT --user=$MYSQL_USERNAME --password=$MYSQL_PASSWORD --database=nextcloud < database.bak
+mysql --host=$MYSQL_HOST --port=$MYSQL_PORT --user=$MYSQL_USERNAME --password=$MYSQL_PASSWORD --database=$DATABASE_NAME < database.bak
 if [ $? -ne 0 ]; then exit 1; fi
 
 # Copy config and update privileges
@@ -50,7 +52,7 @@ docker exec organize-me-nextcloud chown -R www-data /var/www/html/themes || exit
 # Cleanup
 rm database.bak
 rm -rf files
-rm nextcloud.zip
+rm $BACKUP_ZIP
 
 # Maintenace Mode OFF
 docker exec --user www-data organize-me-nextcloud php occ maintenance:mode --off

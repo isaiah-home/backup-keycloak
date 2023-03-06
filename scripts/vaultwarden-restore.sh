@@ -16,7 +16,7 @@ fi
 
 
 # Pull restore file
-aws s3 cp s3://backups.$DOMAIN/vaultwarden.zip vaultwarden.zip || exit 1
+aws s3 cp s3://organize-me.$DOMAIN.backups/vaultwarden.zip vaultwarden.zip || exit 1
 
 # Unzip restore file
 unzip vaultwarden.zip || exit 1

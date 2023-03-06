@@ -18,6 +18,8 @@ export BACKUP_NAME=keycloak
 export BACKUP_BAK=database.bak
 export BACKUP_ZIP=$BACKUP_NAME.zip
 
+docker stop organize-me-keycloak
+
 # Dump database to file
 mysqldump --host=$MYSQL_HOST --port=$MYSQL_PORT --user=$MYSQL_USERNAME --password=$MYSQL_PASSWORD keycloak > $BACKUP_BAK
 if [ $? -ne 0 ]; then exit 1; fi
@@ -26,8 +28,10 @@ if [ $? -ne 0 ]; then exit 1; fi
 zip $BACKUP_ZIP $BACKUP_BAK || exit 1
 
 # Save zip to s3
-aws s3 cp $BACKUP_ZIP s3://backups.$DOMAIN/$BACKUP_ZIP || exit 1
+aws s3 cp $BACKUP_ZIP s3://organize-me.$DOMAIN.backups/$BACKUP_ZIP || exit 1
 
 # Cleanup
 rm $BACKUP_BAK
 rm $BACKUP_ZIP
+
+docker start organize-me-keycloak
