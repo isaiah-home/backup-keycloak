@@ -18,10 +18,12 @@ Add the following jobs
 ```
 00 2 * * * . bin/env.sh; bin/keycloak-backup.sh >> logs/keycloak.log 2>&1
 10 2 * * * . bin/env.sh; bin/wikijs-backup.sh >> logs/wikijs.log 2>&1
-20 2 * * * . bin/env.sh; bin/nextcloud-backup.sh >> logs/nextcloud.log 2>&1
+20 2 * * * . bin/env.sh; bin/vaultwarden-backup.sh >> logs/vaultwarden.log 2>&1
 30 2 * * * . bin/env.sh; bin/snipeit-backup.sh >> logs/snipeit.log 2>&1
-40 2 * * * . bin/env.sh; bin/vaultwarden-backup.sh >> logs/vaultwarden.log 2>&1
+40 2 * * * . bin/env.sh; bin/nextcloud-backup.sh >> logs/nextcloud.log 2>&1
 ```
+
+Note that nextcloud is the last service to be backed up. This is because it can take much longer than the others.
 
 # Restores
 Restoring is a simple as calling the restore script for the target service.
